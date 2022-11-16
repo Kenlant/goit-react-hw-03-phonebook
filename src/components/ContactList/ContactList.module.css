@@ -1,0 +1,9 @@
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contact-list-item-rm-btn {
+  margin-left: 10px;
+}
