@@ -5,24 +5,26 @@ import Section from 'components/Section/Section';
 import ContactList from 'components/ContactList/ContactList';
 import styles from './ContactsBook.module.css';
 import Filter from 'components/Filter/Filter';
+import Storage from '../../services/storage';
 
 export default class ContactsBook extends Component {
   constructor() {
     super();
 
     this.state = {
-      contacts: [
-        { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-        { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-        { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-        { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-      ],
+      contacts: [],
       filter: ``,
     };
 
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
     this.handleDeleteContact = this.handleDeleteContact.bind(this);
+    this.storage = new Storage();
+  }
+
+  componentDidMount() {
+    const contacts = this.storage.getContacts();
+    this.setState({ contacts });
   }
 
   handleFormSubmit(values) {
@@ -37,16 +39,18 @@ export default class ContactsBook extends Component {
       return;
     }
 
-    this.setState(prev => ({
-      contacts: [
+    this.setState(prev => {
+      const contacts = [
         ...prev.contacts,
         {
           id: `id-${shortid.generate()}`,
           name,
           number,
         },
-      ],
-    }));
+      ];
+      this.storage.setContacts(contacts);
+      return { contacts };
+    });
   }
 
   handleFilterChange(value) {
@@ -56,9 +60,11 @@ export default class ContactsBook extends Component {
   }
 
   handleDeleteContact(id) {
-    this.setState(prev => ({
-      contacts: prev.contacts.filter(x => x.id !== id),
-    }));
+    this.setState(prev => {
+      const contacts = prev.contacts.filter(x => x.id !== id);
+      this.storage.setContacts(contacts);
+      return { contacts };
+    });
   }
 
   render() {
